@@ -1,0 +1,137 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct arvoreBinaria {
+    int elem;
+    struct arvoreBinaria *esq;
+    struct arvoreBinaria *dir;
+} arvoreBinaria;
+
+arvoreBinaria* insere(arvoreBinaria *a, int el);
+arvoreBinaria* remover(arvoreBinaria *a, int el);
+void preordem(arvoreBinaria *a);
+void emordem(arvoreBinaria *a);
+void posordem(arvoreBinaria *a);
+arvoreBinaria* menor_no(arvoreBinaria *a);
+
+int main() {
+    arvoreBinaria *raiz = NULL;
+    int x;
+    char op;
+
+    do {
+        printf("\n1 - Inserir\n2 - Excluir\n3 - Pre-Ordem\n4 - Em-Ordem\n5 - Pos-Ordem\n6 - Sair\n> ");
+        scanf(" %c", &op);
+
+        switch (op) {
+            case '1':
+                printf("Digite o valor: ");
+                scanf("%d", &x);
+                raiz = insere(raiz, x);
+                break;
+            case '2':
+                if (raiz != NULL) {
+                    printf("Digite o valor: ");
+                    scanf("%d", &x);
+                    raiz = remover(raiz, x);
+                } else {
+                    printf("Árvore vazia.\n");
+                }
+                break;
+            case '3':
+                preordem(raiz);
+                break;
+            case '4':
+                emordem(raiz);
+                break;
+            case '5':
+                posordem(raiz);
+                break;
+            case '6':
+                printf("Saindo...\n");
+                break;
+            default:
+                printf("Opção inválida!\n");
+                break;
+        }
+    } while (op != '6');
+
+    return 0;
+}
+
+arvoreBinaria* insere(arvoreBinaria *a, int el) {
+    if (a == NULL) {
+        a = (arvoreBinaria*) malloc(sizeof(arvoreBinaria));
+        a->elem = el;
+        a->esq = a->dir = NULL;
+        printf("Valor inserido.\n");
+    } else if (el < a->elem) {
+        a->esq = insere(a->esq, el);
+    } else if (el > a->elem) {
+        a->dir = insere(a->dir, el);
+    } else {
+        printf("Valor duplicado!\n");
+    }
+    return a;
+}
+
+arvoreBinaria* remover(arvoreBinaria *a, int el) {
+    if (a == NULL) {
+        printf("Elemento não encontrado.\n");
+        return NULL;
+    }
+
+    if (el < a->elem)
+        a->esq = remover(a->esq, el);
+    else if (el > a->elem)
+        a->dir = remover(a->dir, el);
+    else {
+        if (a->esq == NULL && a->dir == NULL) {
+            free(a);
+            return NULL;
+        } else if (a->esq == NULL) {
+            arvoreBinaria *temp = a->dir;
+            free(a);
+            return temp;
+        } else if (a->dir == NULL) {
+            arvoreBinaria *temp = a->esq;
+            free(a);
+            return temp;
+        } else {
+            arvoreBinaria *temp = menor_no(a->dir);
+            a->elem = temp->elem;
+            a->dir = remover(a->dir, temp->elem);
+        }
+    }
+    return a;
+}
+
+arvoreBinaria* menor_no(arvoreBinaria *a) {
+    while (a != NULL && a->esq != NULL)
+        a = a->esq;
+    return a;
+}
+
+void preordem(arvoreBinaria *a) {
+    if (a != NULL) {
+        printf("%d ", a->elem);
+        preordem(a->esq);
+        preordem(a->dir);
+    }
+}
+
+void emordem(arvoreBinaria *a) {
+    if (a != NULL) {
+        emordem(a->esq);
+        printf("%d ", a->elem);
+        emordem(a->dir);
+    }
+}
+
+void posordem(arvoreBinaria *a) {
+    if (a != NULL) {
+        posordem(a->esq);
+        posordem(a->dir);
+        printf("%d ", a->elem);
+    }
+}
